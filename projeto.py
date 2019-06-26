@@ -1,11 +1,10 @@
 import  sys
-#from datetime import date
 
-TODO_FILE = 'testeProjetoAgenda.txt'
-ARCHIVE_FILE = 'feito.txt'
+TODO_FILE = 'todo.txt'
+ARCHIVE_FILE = 'done.txt'
 
 RED   = "\033[1;31m"  
-BLUE  = "\033[1;34m"
+BLUE  = "\033[0;34m"
 CYAN  = "\033[1;36m"
 GREEN = "\033[0;32m"
 RESET = "\033[0;0m"
@@ -24,12 +23,6 @@ def printCores(texto, cor) :
   print(cor + texto + RESET)
 
 def adicionar(descricao,extras):
-   
-   #print(descricao)
-   #print(extras)
-   
-  # não é possível adicionar uma atividade que não possui descrição.
-  
    if descricao  == '' :
       return False
    
@@ -47,8 +40,6 @@ def adicionar(descricao,extras):
       if extras[x] is not '':
          novaAtividade += extras[x]+espaço
 
-   #if extras[0] == extras[1]== extras[2] == extras[3] == extras[4] == vazio:
-      #novaAtividade = descricao
       
    print('Atividade Salva: {}'.format(novaAtividade))
   # Escreve no TODO_FILE. 
@@ -117,8 +108,6 @@ def prioridadeValida(pri):
       return True
    return False
 
-   
-#itens = [] 
 def organizar(linhas):
    itens = []
    for l in linhas:
@@ -143,7 +132,7 @@ def organizar(linhas):
          pri = tokens[0]
          tokens.pop(0)
 
-      if contextoValido(tokens[-2])== True:
+      if len(tokens) > 1 and contextoValido(tokens[-2])== True:
          contex = tokens[-2]
          tokens.pop(-2)
          
@@ -155,57 +144,36 @@ def organizar(linhas):
          desc += x +' '
          
    itens.append((desc,(data, hora, pri, contex, proj)))
-   #print(itens)
    return itens
-
-
 
 def organizadoBonito(bagunca):
    novaOrdem = []
    junto= ''
    espaço =' '
-   #semEspaço = bagunça.strip()
-   #quebrado = semEspaço.split()
-   
-   # data hora prioridade desc @ +
-
+  
    if bagunca[0][1][0] != '':
       dataNaOrdem = dataBonita(bagunca[0][1][0])
-      #novaOrdem.insert(1,dataNaOrdem)
-      #dataNaOrdem = bagunca[0][1][0]
-      #novaOrdem.append(dataNaOrdem)
       junto+= dataNaOrdem +espaço
       
    if bagunca[0][1][1] != '':
       horaNaOrdem = horaBonita(bagunca[0][1][1])
-      #novaOrdem.insert(2,horaNaOrdem)
-      #horaNaOrdem = bagunca[0][1][1] 
-      #novaOrdem.append(horaNaOrdem)
       junto+= horaNaOrdem +espaço
       
    if bagunca[0][1][2] != '':
       priNaOrdem = bagunca[0][1][2]
-      #novaOrdem.insert(3,)
-      #novaOrdem.append(priNaOrdem)
       junto+= priNaOrdem +espaço
       
    if bagunca [0][0] != '':  
       descNaOrdem = bagunca[0][0]
-      #novaOrdem.insert(0,descNaOrdem)
-      #novaOrdem.append(descNaOrdem)
       junto+= descNaOrdem +espaço
 
    if bagunca[0][1][3] != '':
       contxtNaOrdem = bagunca[0][1][3]
-      #novaOrdem.append(contxtNaOrdem)
       junto+= contxtNaOrdem +espaço
 
-   if bagunca[0][1][4] != '': #x
-      projNaOrdem = bagunca[0][1][4] #x
-      #novaOrdem.append(projNaOrdem) #x
+   if bagunca[0][1][4] != '': 
+      projNaOrdem = bagunca[0][1][4] 
       junto+= projNaOrdem +espaço
-      
-   #novaOrdem.append(junto)
 
    return junto
 
@@ -255,11 +223,14 @@ def ordenarPorDataHora(itens):
    while cont != 0 :
       for x in range(qte):
          if itens[x][0][1][2] ==  itens[x+1][0][1][2]:
-            if itens[x][0][1][0] < itens[x+1][0][1][0]:
+            if itens[x][0][1][0] > itens[x+1][0][1][0] and itens[x][0][1][0] is not  '':
                itens[x],itens[x+1] = itens[x+1] , itens[x]
             if itens[x][0][1][0] == itens[x+1][0][1][0]:
-              if itens[x][0][1][1] < itens[x+1][0][1][1]:
+              if itens[x][0][1][1] > itens[x+1][0][1][1] and itens[x+1][0][1][1] is not '' or itens[x][0][1][1] < itens[x+1][0][1][1] and itens[x][0][1][1] is  '':
                  itens[x],itens[x+1] = itens[x+1],itens[x]
+            
+            if itens[x][0][1][0] < itens[x+1][0][1][0] and itens[x][0][1][0] is  '':
+               itens[x],itens[x+1] = itens[x+1] , itens[x]
       cont -=1        
                
    return itens
@@ -275,13 +246,10 @@ def ordenarPorPrioridade(itens):
       for x in range(qteDeAtividade):      
          if itens[x][0][1][2] == alfa[cont]:
             itens2.append(itens[x])
-            #itens2.insert(x,itens[x])
       cont+=1      
    for x in range(qteDeAtividade):      
       if itens[x][0][1][2] == vazio:
-         itens2.append(itens[x])
-         #itens2.insert(-1,itens[x])
-         
+         itens2.append(itens[x])       
    itens = itens2
       
    return itens
@@ -306,9 +274,6 @@ def adicionaFeito(atividade):
   
   
 def fazer(num):
-  #agenda = open(TODO_FILE,'r')
-  #todasAsLinhas = agenda.readlines()
-  #agenda.close()
   linhasDoArquivo = abrir()
   listagem = listar()
   atividadeRealizada = organizadoBonito(listagem[num])
@@ -318,35 +283,19 @@ def fazer(num):
     pivo = linhasDoArquivo[cont]
     pivo = organizadoBonito(organizar(pivo))
     if pivo[:-2] == atividadeRealizada[:-2]:
-      #arquivoFeito = open(ARCHIVE_FILE,'a')
-      #arquivoFeito.write(pivo + ' \n')
-      #arquivoFeito.close()
       adicionaFeito(pivo)
       linhasDoArquivo.pop(cont)
       qte-=1
     cont +=1
     
   print('{}foi feito'.format(atividadeRealizada))
-  #arquivo = open(TODO_FILE,'w')
-  #for x in range(qte):
-    #arquivo.write(todasAsLinhas[x])
-  #arquivo.close()
-
   return reescrever(linhasDoArquivo)
 
 
 def remover(x):
-  #agenda =open(TODO_FILE,'r')
-  #todasAsLinhas = agenda.readlines()
-  #agenda.close
   linhasDoArquivo = abrir()
   listagem = listar()
-  #print(listagem)
-  #print('\n')
   item = organizadoBonito(listagem[x])
-  #print(item)
-  ##print('\n')
-  #print(todasAsLinhas)
   qte = len(linhasDoArquivo)
   cont = 0
   while cont < qte:
@@ -356,144 +305,55 @@ def remover(x):
       linhasDoArquivo.pop(cont)
       qte-=1
     cont +=1
-  #print(todasAsLinhas)
   print('{}foi removido'.format(item))
 
   return reescrever(linhasDoArquivo)
-  
-  #arquivo = open(TODO_FILE,'w')
-  
-  #for x in range(qte):
-    #arquivo.write(todasAsLinhas[x])
-  #arquivo.close()
-  
-  #return todasAsLinhas
 
-
-# prioridade é uma letra entre A a Z, onde A é a mais alta e Z a mais baixa.
-# num é o número da atividade cuja prioridade se planeja modificar, conforme
-# exibido pelo comando 'l'.
-'''
-def paraPriorizar(corpo,adicional,prioridade):
+def frases(elem,elem2):
+  desc = elem
+  data = elem2[0]
+  hora = elem2[1]
+  pri = elem2[2]
+  ctx =elem2[3]
+  proj =elem2[4]
+  novaFrase=''
   espaço =' '
-  vazio =''
-  comPrioridade =''
-  adicional[2] = prioridade
-   
-  for x in range(0,3):
-    if adicional[x] is not '':
-      comPrioridade += adicional[x]+espaço
-      
-  comPrioridade += corpo + espaço
-   
-  for x in range(3,5):
-    if adicional[x] is not '':
-      comprioridade += adicional[x]+espaço
+  if data is not '':
+    novaFrase +=data+espaço
+  if hora is not '':
+    novaFrase +=hora+espaço
+  if pri is not '':
+    novaFrase+=pri+espaço
+  if desc is not '':
+    novaFrase+=desc+espaço
+  if ctx is not '':
+    novaFrase+=ctx+espaço
+  if proj is not '':
+    novaFrase+=proj
+  return novaFrase +'\n'
 
-  return comPrioridade
-  '''
-      
 def priorizar(num, prioridade):
+  alterado = []
+  atualizado =[]
   prioridade = '('+prioridade+') '
   linhasDoArquivo = abrir()
-  listagem = listar()
-  #print(listagem)
-  atividadeRealizada = organizadoBonito(listagem[num])
-  #print(atividadeRealizada)
-  qte = len(linhasDoArquivo)
-  cont = 0
-  while cont < qte:
-    pivo = linhasDoArquivo[cont]
-    pivo = organizadoBonito(organizar(pivo))
-    if pivo[:-2] == atividadeRealizada[:-2]:
-      item = organizar(pivo)
-      linhasDoArquivo.pop(cont)
-      espaço = ' '
-      corpo = item[0][0]
-      vazio = ''
-      comPri = ''
-      #print('esse eh o item {}'.format(item))
-      #print('este eh o corpo {}'.format(corpo))
-      for i in range(0,2):
-        if item[0][1][i] != vazio:
-          add = item[0][1][i]
-          comPri += add+ espaço
-      comPri+= prioridade + corpo + espaço
+  a = listar()
+  for x in range(len(a)):
+    alterado.append(a[x][0])
+  novadesc =alterado[num][0]
+  data = alterado[num][1][0]
+  hora = alterado[num][1][1]
+  contexto = alterado[num][1][3]
+  projeto = alterado[num][1][4]
+  novaAtiv = (novadesc, (data, hora, prioridade, contexto, projeto))
+  alterado.pop(num)
+  alterado.insert(num,novaAtiv)
+  for x in range(len(alterado)):
+    novosItens = frases(alterado[x][0],alterado[x][1])
+    atualizado.append(novosItens)
+  print('Prioridade Alterada')
 
-      for x in range(3,5):
-        if item[0][1][i] != vazio:
-          add = item[0][1][i]
-          comPri += add
-      #adicionaFeito(comPri +'\n')
-      #print('\n',comPri)
-      linhasDoArquivo.append(comPri +'\n')
-      #linhasDoArquivo.pop(cont)
-      qte-=1
-    cont +=1
-  #print(linhasDoArquivo)
-  return reescrever(linhasDoArquivo)
-
-
-
-
-
-
-
-  '''
-  
-  print(todasAsAtividades)
-  print(prioridade)
-  listagem = listar()
-  alterarPri = organizadoBonito(listagem[num])
-  qte = len(todasAsAtividades)
-  cont = 0
-  while cont < qte:
-    pivo = todasAsAtividades[cont]
-    pivo = organizadoBonito(organizar(pivo))
-    if pivo[:-2] == alterarPri[:-2]:
-      
-      #pivo = organizar(pivo)
-      #print(pivo)
-      #comPri = paraPriorizar(pivo[0][0],pivo[0][1],prioridade)
-      #todasAsAtividades.pop(cont)
-      #todasAsAtividades.append(comPri)
-      #qte -=1
-      
-      arrumado = organizar(pivo)
-      espaço =' '
-      vazio =''
-      comPrioridade =''
-      #arrumado[0][1][2] = prioridade
-      corpo = arrumado[0][0]
-   
-      for x in range(0,2):
-        if arrumado[0][1][x] is not '':
-          comPrioridade += arrumado[0][1][x]+espaço
-          
-      comPrioridade += corpo + espaço
-       
-      for x in range(3,5):
-        if arrumado[x] is not '':
-          comPrioridade += proridade+arrumado[x]+espaço
-      todasAsAtividades.pop(cont)
-      todasAsAtividades.append(comPri)
-      qte -=1
-          
-  print('{}teve sua prioridade alterada.'.format(pivo))
-  return reescrever(linhasDoArquivo)
-  '''
-      
-
-  ################ COMPLETAR
-
-  #return 
-
-
-
-
-      
-      
-
+  return reescrever(atualizado)
 
 def processarComandos(comandos):
   if comandos[1] == ADICIONAR:
@@ -508,51 +368,51 @@ def processarComandos(comandos):
     else:
       a = listar()
       for x in range(len(a)):
-        #if a[x][0][1][2] == '(A)':
-          #print('{} {}'.format(x+1,printCores(organizadoBonito(a[x]),YELLOW)))
-        #elif a[x][0][1][2] == '(B)':
-          #print('{} {}'.format(x+1,printCores(organizadoBonito(a[x]),BLUE)))
-        #elif a[x][0][1][2] == '(C)':
-          #print('{} {}'.format(x+1,printCores(organizadoBonito(a[x]),CYAN)))
-        #elif a[x][0][1][2] == '(D)':
-          #print('{} {}'.format(x+1,printCores(organizadoBonito(a[x]),GREEN)))
-        #else:
-          print('{} {}'.format(x+1,organizadoBonito(a[x])))
-   
-    ################ COMPLETAR
+        ordem = x+1
+        espaço = ' '
+        tarefa = str(ordem)+espaço+organizadoBonito(a[x])
+        if a[x][0][1][2] == '(A)':
+           printCores(tarefa,CYAN)
+        elif a[x][0][1][2] == '(B)':
+           printCores(tarefa,GREEN)
+        elif a[x][0][1][2] == '(C)':
+           printCores(tarefa,YELLOW)
+        elif a[x][0][1][2] == '(D)' :
+           printCores(tarefa,BLUE)
+        else:
+           print('{}'.format(tarefa)) 
+      
 
   elif comandos[1] == REMOVER:
     atividade = comandos[2]
     atividade = int(atividade)
+    if atividade not in range(len(listar)):
+      print('A atividade indicada não existe')
     
     return remover(atividade-1)    
 
   elif comandos[1] == FAZER:
     colocacao = comandos[2]
     colocacao = int(colocacao)
-    
-    return fazer(colocacao-1)    
+    if colocacao not in range(len(listar())):
+      print('A atividade indica não existe')
+      return False
+    else:
+      return fazer(colocacao-1)    
 
-    #return    
-
-    ################ COMPLETAR
 
   elif comandos[1] == PRIORIZAR:
     alfa ='QWERTYUIOPASDFGHJKLÇZXCVBNM'
     ordem = comandos[2]
     ordem = int(ordem)
     prioridade = comandos[3].upper()
-    if prioridade not in alfa:
+    if prioridade not in alfa or ordem not in range(len(listar())):
+      print('A atividade indica não existe')
       return False
     else:
       return priorizar(ordem-1,prioridade)
-    
-
-    ################ COMPLETAR
 
   else :
     print("Comando inválido.")
     
 processarComandos(sys.argv)
-
-   
